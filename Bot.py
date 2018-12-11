@@ -12,7 +12,7 @@ import operator
 script_dir = os.path.dirname(__file__)
 tokenfile = "tokenCookie.txt"
 
-abs_token_path = os.path.join(script_dir, tokenfile)
+abs_token_path = os.path.join(script_dir, "tokens", tokenfile)
 
 client = discord.Client()
 token = RecourceManager.load_token(abs_token_path)
