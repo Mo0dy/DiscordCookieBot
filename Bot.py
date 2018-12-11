@@ -10,7 +10,7 @@ import operator
 
 
 script_dir = os.path.dirname(__file__)
-tokenfile = "tokenCookie.txt"
+tokenfile = "tokenDebug.txt"
 
 abs_token_path = os.path.join(script_dir, "tokens", tokenfile)
 
@@ -64,7 +64,7 @@ class Bot(object):
     """The Bot controls all interaction with Discord"""
     def __init__(self, name="Game"):
         # Bot settings
-        self.command_prefix = "?"
+        self.command_prefix = "."
         self.allow_exec = True  # if the exec command is allowed
         self.exec_users = ["159065682137317376"]  # a list of users that can use exec
 
@@ -310,6 +310,7 @@ class Bot(object):
                 "\n**ADMIN COMMANDS**:\n",
                 "**{}give_gold** <@mention> gives the golden cookie to the mentioned user".format(self.command_prefix),
                 "**{}print_settings** prints the settings (object dictionary)".format(self.command_prefix),
+                "**{}give_cookies** <n> <@mention> gives n cookies to the mention or one if there is no n".format(self.command_prefix),
             ]
 
         await client.send_message(channel, "\n" + mention + " " + "commands:\n" + ("\n").join(lines))
@@ -583,7 +584,18 @@ class Bot(object):
     async def test(self, author, mentions, channel, param):
         for r in channel.server.roles:
             print(r.name, r.id)
-
+            
+    async def give_cookies(self, author, mentions, channel, param):
+        if not mentions:
+            return
+        target = mentions[0]
+        amount = 1
+        if param and param[0].isdigit():
+            amount = int(param[0])
+        self.ifnew(target)
+        self.jars[target] += amount
+        await client.send_message(channel, "%s you gave %s %i new cookies" % (self.get_mention(author), self.get_mention(target), amount))
+        
     async def handle_message(self, message):
         commands = {
             "time": self.print_stealtime,
@@ -604,6 +616,7 @@ class Bot(object):
             "give_gold": self.give_gold,
             "print_settings": self.print_settings,
             "test": self.test,
+            "give_cookies": self.give_cookies,
         }
 
         if message.content.startswith(self.command_prefix):
