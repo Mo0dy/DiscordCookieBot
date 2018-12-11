@@ -264,7 +264,17 @@ class Bot(object):
             await client.send_message(channel, "congratulations %s you are the new cookie king" % self.get_mention(max_user))
 
     # Command funcitons ===================================================================
-
+    
+    async def print_stealable(self, author, mentions, channel, param):
+        stealable = []
+        for m in channel.server.members:
+            if m != author and str(m.status) == "online" and not "bot" in [r.name.lower() for r in m.roles]:
+                self.ifnew(m)
+                if self.jars[m] > 0:
+                    stealable.append(m.name)
+        print(stealable)
+        await client.send_message(channel, "{} you can steal from:\n```\n".format(self.get_mention(author)) + "\n".join(stealable) + "\n```")
+    
     async def print_stealtime(self, author, mentions, channel, param):
         """prints the time a user has left to steal"""
         self.ifnew(author)
@@ -281,27 +291,28 @@ class Bot(object):
     async def print_help(self, author, mentions, channel, param):
         mention = self.get_mention(author)
         lines = [
-            "**jar** tells you how much cookies you have in your jar",
-            "**criminality** tells you how criminal you are",
-            "**jailtime** tells you how much time you have left in jail",
-            "**steal <@mention>** you try to steal one cookie from the mentioned person",
-            "**stop** you block all steals directed at you",
-            "**gift <n> <@mention>** you gift n cookies to @mention",
-            "**time** will tell you how long until you can steal again",
-            "**stealgolden** <@mention> steals the golden cookie",
-            "**rank** prints out the rankings",
-            "**eat** you eat a cookie and gain {}% stealspeed for {} hours".format(round((1 - self.fed_percentage) * 100), int(self.fed_time // 3600)),
-            "**help** shows you this list",
+            "**{}jar** tells you how much cookies you have in your jar".format(self.command_prefix),
+            "**{}criminality** tells you how criminal you are".format(self.command_prefix),
+            "**{}jailtime** tells you how much time you have left in jail".format(self.command_prefix),
+            "**{}steal <@mention>** you try to steal one cookie from the mentioned person".format(self.command_prefix),
+            "**{}stop** you block all steals directed at you".format(self.command_prefix),
+            "**{}gift <n> <@mention>** you gift n cookies to @mention".format(self.command_prefix),
+            "**{}time** will tell you how long until you can steal again".format(self.command_prefix),
+            "**{}stealgolden** <@mention> steals the golden cookie".format(self.command_prefix),
+            "**{}rank** prints out the rankings".format(self.command_prefix),
+            "**{}eat** you eat a cookie and gain {}% stealspeed for {} hours".format(self.command_prefix, round((1 - self.fed_percentage) * 100), int(self.fed_time // 3600)),
+            "**{}stealable** prints the people you are allowed to steal from".format(self.command_prefix),
+            "**{}help** shows you this list".format(self.command_prefix),
         ]
 
         if author.server_permissions.administrator:
             lines += [
-                "\n**ADMIN COMMANDS**:\n"
-                "**give_gold** <@mention> gives the golden cookie to the mentioned user",
-                "**print_settings** prints the settings (object dictionary)",
+                "\n**ADMIN COMMANDS**:\n",
+                "**{}give_gold** <@mention> gives the golden cookie to the mentioned user".format(self.command_prefix),
+                "**{}print_settings** prints the settings (object dictionary)".format(self.command_prefix),
             ]
 
-        await client.send_message(channel, "\n" + mention + " " + "commands:\n" + "\n".join(lines))
+        await client.send_message(channel, "\n" + mention + " " + "commands:\n" + ("\n").join(lines))
 
     async def print_rankings(self, author, mentions, channel, param):
         """prints rankings and highlights the author
@@ -414,14 +425,18 @@ class Bot(object):
         # now wait and then check if it has been restolen
         # await asyncio.sleep(r_time)
 
-        temp = await client.wait_for_reaction(user=victim, timeout=r_time)
+        temp = await client.wait_for_reaction(message=message, user=victim, timeout=r_time)
         if temp:
             reaction = temp[0]
             user = temp[1]
             if reaction.emoji == "🛑":
                 await self.stop(user, [], channel, [])
+                return
             elif reaction.emoji == "🔫":
-                self.resteals[victim].remove(resteal)
+                if resteal in self.resteals[victim]:
+                    self.resteals[victim].remove(resteal)
+                else:
+                    return
                 # try to steal more cookies back
                 amount = min(self.jars[author], self.quick_resteal_amount + 1)
                 if amount:
@@ -434,7 +449,7 @@ class Bot(object):
                         self.add_resteal(author, resteal)
                         message = await client.send_message(channel, "%s quickstole %i cookies from %s. He has %i seconds to stop you" % (victim_mention, amount, mention, r_time))
                         await client.add_reaction(message, "🛑")
-                        temp = await client.wait_for_reaction(user=author, timeout=r_time)
+                        temp = await client.wait_for_reaction(message=message, user=author, timeout=r_time)
                         if temp:
                             reaction = temp[0]
                             user = temp[1]
@@ -443,7 +458,6 @@ class Bot(object):
                         await client.send_message(channel, "%s stole back his cookie from %s. He tried to steal more but %s is poor :/" % (mention, victim_mention, mention))
                 else:
                     await client.send_message(channel, "%s you cannot quicksteal from %s because he has no cookies" % (victim_mention, mention))
-
             return
 
         await self.check_cookie_king(channel.server, channel)
@@ -567,7 +581,8 @@ class Bot(object):
         await client.send_message(channel, ("\n%s settings: ```\n" + "\n".join(list(self.__dict__.keys())) + "\n```") % self.get_mention(author))
 
     async def test(self, author, mentions, channel, param):
-        await self.add_criminal_score(author, 90, channel)
+        for r in channel.server.roles:
+            print(r.name, r.id)
 
     async def handle_message(self, message):
         commands = {
@@ -582,6 +597,7 @@ class Bot(object):
             "stop": self.stop,
             "criminality": self.criminality,
             "jailtime": self.print_jailtime,
+            "stealable": self.print_stealable,
         }
 
         admin_commands = {
@@ -594,7 +610,10 @@ class Bot(object):
             author = message.author
             channel = message.channel
             com_list = message.content[len(self.command_prefix):].split()
-            command = com_list[0]
+            if com_list:
+                command = com_list[0]
+            else:
+                return  # just a questionmark
             mentions = message.mentions
 
             if command == "exec":
