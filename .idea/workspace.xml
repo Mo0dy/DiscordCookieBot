@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4d2e4b91-bfea-41f4-91ec-a3d8aca69ba0" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/Bot.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,8 +25,8 @@
       <file leaf-file-name="Bot.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Bot.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="394">
-              <caret line="437" column="24" selection-start-line="437" selection-start-column="24" selection-end-line="437" selection-end-column="24" />
+            <state relative-caret-position="527">
+              <caret line="421" lean-forward="true" selection-start-line="421" selection-end-line="421" />
               <folding>
                 <element signature="e#0#14#0" expanded="true" />
                 <element signature="e#1342#3670#0" />
@@ -252,12 +251,18 @@
       <option name="project" value="LOCAL" />
       <updated>1544556385350</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="fixed bug where idle was excluded in the ?stealable command&#10;rebalanced quicksteal and added a steal based on the amount of the cookies in the jar of the victim">
+      <created>1544630355416</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1544630355416</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24973656" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -283,7 +288,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added give_cookie method" />
-    <option name="LAST_COMMIT_MESSAGE" value="added give_cookie method" />
+    <MESSAGE value="fixed bug where idle was excluded in the ?stealable command&#10;rebalanced quicksteal and added a steal based on the amount of the cookies in the jar of the victim" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed bug where idle was excluded in the ?stealable command&#10;rebalanced quicksteal and added a steal based on the amount of the cookies in the jar of the victim" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -648,8 +654,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Bot.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="394">
-          <caret line="437" column="24" selection-start-line="437" selection-start-column="24" selection-end-line="437" selection-end-column="24" />
+        <state relative-caret-position="527">
+          <caret line="421" lean-forward="true" selection-start-line="421" selection-end-line="421" />
           <folding>
             <element signature="e#0#14#0" expanded="true" />
             <element signature="e#1342#3670#0" />

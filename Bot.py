@@ -440,13 +440,13 @@ class Bot(object):
                 else:
                     return
                 # try to steal more cookies back
-                amount = min(self.jars[author], self.quick_resteal_amount + 1 + self.quick_resteal_proportion * self.jars[author])
+                amount = min(self.jars[author], self.quick_resteal_amount + 1 + int(self.quick_resteal_proportion * self.jars[author]))
                 if amount:
                     self.jars[author] -= amount
                     self.jars[victim] += amount
                     self.save_jars()
                     if amount > 1:  # stole more back then you thought
-                        r_time = int(self.quick_resteal_time * self.fed_percentage) if self.isfed(author) else self.resteal_time_s
+                        r_time = int(self.quick_resteal_time * self.fed_percentage) if self.isfed(author) else self.quick_resteal_time
                         resteal = Resteal(victim, time.time() + r_time, amount=amount)
                         self.add_resteal(author, resteal)
                         message = await client.send_message(channel, "%s quickstole %i cookies from %s. He has %i seconds to stop you" % (victim_mention, amount, mention, r_time))
@@ -583,8 +583,9 @@ class Bot(object):
         await client.send_message(channel, ("\n%s settings: ```\n" + "\n".join(list(self.__dict__.keys())) + "\n```") % self.get_mention(author))
 
     async def test(self, author, mentions, channel, param):
-        for r in channel.server.roles:
-            print(r.name, r.id)
+        for k in self.jars.keys():
+            self.jars[k] = int(self.jars[k])
+        self.save_jars()
             
     async def give_cookies(self, author, mentions, channel, param):
         if not mentions:
