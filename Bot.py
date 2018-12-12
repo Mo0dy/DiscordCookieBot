@@ -10,7 +10,7 @@ import operator
 
 
 script_dir = os.path.dirname(__file__)
-tokenfile = "tokenDebug.txt"
+tokenfile = "tokenCookie.txt"
 
 abs_token_path = os.path.join(script_dir, "tokens", tokenfile)
 
@@ -64,7 +64,7 @@ class Bot(object):
     """The Bot controls all interaction with Discord"""
     def __init__(self, name="Game"):
         # Bot settings
-        self.command_prefix = "."
+        self.command_prefix = "?"
         self.allow_exec = True  # if the exec command is allowed
         self.exec_users = ["159065682137317376"]  # a list of users that can use exec
 
@@ -81,8 +81,9 @@ class Bot(object):
         self.savename = "jars"
         self.name = name  # important for saving / loading games
         self.cookieking_id = "521748145646862337"
-        self.quick_resteal_time = 20
+        self.quick_resteal_time = 10
         self.quick_resteal_amount = 2
+        self.quick_resteal_proportion = 0.05  # steal a percentage of the person you are stealing from
         self.jailtime = 60 * 60 * 24
 
         self.golden_owner_string = "golden_cookie"  # the string that is the key for the golden owner in the jars dict
@@ -268,7 +269,7 @@ class Bot(object):
     async def print_stealable(self, author, mentions, channel, param):
         stealable = []
         for m in channel.server.members:
-            if m != author and str(m.status) == "online" and not "bot" in [r.name.lower() for r in m.roles]:
+            if m != author and str(m.status) != "offline" and not "bot" in [r.name.lower() for r in m.roles]:
                 self.ifnew(m)
                 if self.jars[m] > 0:
                     stealable.append(m.name)
@@ -439,7 +440,7 @@ class Bot(object):
                 else:
                     return
                 # try to steal more cookies back
-                amount = min(self.jars[author], self.quick_resteal_amount + 1)
+                amount = min(self.jars[author], self.quick_resteal_amount + 1 + self.quick_resteal_proportion * self.jars[author])
                 if amount:
                     self.jars[author] -= amount
                     self.jars[victim] += amount
